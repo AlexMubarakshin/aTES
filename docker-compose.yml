@@ -1,6 +1,26 @@
 version: "3"
 
 services:
+  auth:
+    container_name: auth
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    restart: always
+    ports:
+      - 3001:3001
+    networks:
+      - app_network
+  task:
+    container_name: task
+    build:
+      context: .
+      dockerfile: ./apps/task-service/Dockerfile
+    restart: always
+    ports:
+      - 3002:3002
+    networks:
+      - app_network
   web:
     container_name: web
     build:
@@ -18,7 +38,7 @@ services:
       dockerfile: ./apps/api/Dockerfile
     restart: always
     ports:
-      - 3001:3001
+      - 3003:3003
     networks:
       - app_network
 
