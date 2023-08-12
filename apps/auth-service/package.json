@@ -22,7 +22,8 @@
     "jsonwebtoken": "^9.0.1",
     "kafkajs": "^2.2.4",
     "logger": "*",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "popug-shared": "*"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

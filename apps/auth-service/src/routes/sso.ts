@@ -1,34 +1,10 @@
 import bcrypt from "bcryptjs";
 import express from "express";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import path from "path";
+import {CUD_EVENT, IPopug, TOPICS_NAMES, uuid} from "popug-shared";
+import {User} from "../schemas/user";
 import {sendMessages} from "../broker";
-
-const userSchema = new mongoose.Schema({
-  email: {type: String, unique: true},
-  password: {type: String, required: true},
-  tokens: [{
-    token: {
-      type: String,
-      required: true
-    }
-  }]
-});
-
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    // @ts-ignore
-    const hashedPassword = await bcrypt.hash(this.password, 8);
-    console.log('password:', this.password, hashedPassword)
-    // @ts-ignore
-    this.password = hashedPassword;
-  }
-  next();
-});
-
-const User = mongoose.model('User', userSchema);
-
 
 export const ssoRoutes = express.Router()
   .get('/register', (req, res) => {
@@ -39,21 +15,46 @@ export const ssoRoutes = express.Router()
   })
   .post('/register', async (req, res) => {
     try {
-      const user = new User(req.body);
+      const {email, password, redirectUrl} = req.body;
+
+      if (!email || !password || !redirectUrl) {
+        throw new Error('Request is not valid')
+      }
+
+
+      const existedUser = await User.findOne({email: email});
+      if (existedUser) {
+        throw new Error('User this email already exists');
+      }
+
+      const publicId = uuid()
+
+      const user = new User({...req.body, publicId, password: await bcrypt.hash(req.body.password, 8)});
       await user.save();
 
-      await sendMessages('user-topic', ['User created'])
+      const popug: IPopug = {
+        publicId,
+        email: user.email,
+        role: user.role
+      }
 
-      res.redirect('/sso/login');
+      await sendMessages(TOPICS_NAMES.USERS_STREAM, [{
+        type: CUD_EVENT.USER_CREATED, data: popug
+      }])
+
+      res.redirect(`/sso/login?redirectUrl=${redirectUrl}`);
     } catch (error) {
       console.error(error)
       res.status(400).send(error);
     }
   })
   .post('/login', async (req, res) => {
-    const {email, password, redirectUrl} = req.body;
-
     try {
+      const {email, password, redirectUrl} = req.body;
+      if (!email || !password || !redirectUrl) {
+        throw new Error('Request is not valid')
+      }
+
       const user = await User.findOne({email: email});
       if (!user) {
         throw new Error('Unable to login');
@@ -64,7 +65,15 @@ export const ssoRoutes = express.Router()
         return res.status(400).send({error: 'Invalid credentials'});
       }
 
-      const token = jwt.sign({_id: user._id.toString()}, 'SUPER_SECRET_KEY');
+      const popug: IPopug = {
+        publicId: user.publicId,
+        email: user.email,
+        role: user.role,
+      }
+      const token = jwt.sign(popug, 'SUPER_SECRET_KEY');
+
+      console.log({popug, token})
+
       user.tokens = user.tokens.concat({token});
       await user.save();
 

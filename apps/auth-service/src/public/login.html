@@ -23,16 +23,21 @@
         <button type="submit">Login</button>
     </div>
 </form>
+<a href="/sso/register" id="register-button">Register</a>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
+        const registerAnchor = document.getElementById('register-button')
+
         const redirectUrl = urlParams.get('redirectUrl');
         if (redirectUrl) {
             document.getElementById('redirectUrl').value = redirectUrl;
+            registerAnchor.href = registerAnchor.href + '?redirectUrl=' + redirectUrl;
         } else {
             document.getElementById('error').textContent = "Error: Missing redirect URL.\n\nExample: ?redirectUrl=http://localhost:3002";
             // Optionally, disable the login form if there's an error
             document.querySelector('form').style.display = 'none';
+            registerAnchor.style.display = 'none'
         }
     });
 </script>

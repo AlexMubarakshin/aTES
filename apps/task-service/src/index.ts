@@ -1,9 +1,20 @@
-import { createServer } from "./server";
-import { log } from "logger";
+import {initBrokerConnection} from "./broker";
+import {CONFIG} from "./config";
+import {initDatabaseConnection} from "./database";
+import {createServer} from "./server";
+import {log} from "logger";
 
-const port = process.env.PORT || 3002;
-const server = createServer();
 
-server.listen(port, () => {
-  log(`task service running on ${port}`);
-});
+async function main() {
+  await initDatabaseConnection()
+
+  await initBrokerConnection()
+
+  const server = createServer();
+
+  server.listen(CONFIG.port, () => {
+    log(`task service running on ${CONFIG.port}`);
+  });
+}
+
+main()

@@ -1,32 +1,30 @@
-// Kafka setup
-import {Kafka} from "kafkajs";
+import {Kafka, logLevel} from "kafkajs";
 import {CONFIG} from "./config";
+import {IBrokerEvent, IBrokerTopic, uuid} from 'popug-shared'
+
+const KAFKA_CLIENT_ID = 'auth-application';
 
 const kafka = new Kafka({
-  clientId: 'my-app',
-  brokers: [`localhost:${CONFIG['broker_port']}`]
+  clientId: KAFKA_CLIENT_ID,
+  brokers: [`localhost:${CONFIG['broker_port']}`],
+  logLevel: logLevel.DEBUG
 });
 
 const producer = kafka.producer();
-const consumer = kafka.consumer({groupId: 'user-group'});
 
 export const initBrokerConnection = async () => {
   await producer.connect();
-  await consumer.connect();
-  await consumer.subscribe({topic: 'user-topic', fromBeginning: true});
-
-  consumer.run({
-    eachMessage: async ({topic, partition, message}) => {
-      console.log({
-        value: message.value?.toString(),
-      });
-    },
-  });
 };
 
-
-export async function sendMessages(topic: string, events: Array<Record<string, any> | string>) {
-  const messages = events.map((event) => ({value: JSON.stringify(event)}));
+export async function sendMessages(topic: IBrokerTopic, events: IBrokerEvent[]) {
+  const messages = events.map((event) => ({
+    value: JSON.stringify({
+      ...event,
+      producer: KAFKA_CLIENT_ID,
+      time: new Date(),
+      id: uuid()
+    })
+  }));
 
   return producer.send({topic, messages});
 }
