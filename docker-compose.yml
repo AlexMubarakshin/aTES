@@ -1,20 +1,20 @@
 version: "3"
 
 services:
-  #  auth:
-  #    container_name: auth
-  #    build:
-  #      context: .
-  #      dockerfile: ./apps/auth-service/Dockerfile
-  #    restart: always
-  #    environment:
-  #      PORT: 3001
-  #      BROKER_PORT: 9092
-  #      DB_CONNECTION_URL: mongodb://admin:password@localhost:27017/?authMechanism=DEFAULT
-  #    ports:
-  #      - 3001:3001
-  #    networks:
-  #      - ates_network
+  auth:
+    container_name: auth
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    restart: always
+    environment:
+      PORT: 3001
+      BROKER_PORT: 9092
+      DB_CONNECTION_URL: mongodb://admin:password@localhost:27017/?authMechanism=DEFAULT
+    ports:
+      - 3001:3001
+    networks:
+      - ates_network
   auth-db:
     image: mongo:latest
     ports:
@@ -33,21 +33,21 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     networks:
       - ates_network
-  #  task:
-  #    container_name: task
-  #    build:
-  #      context: .
-  #      dockerfile: ./apps/task-service/Dockerfile
-  #    restart: always
-  #    environment:
-  #      PORT: 3002
-  #      BROKER_PORT: 9092
-  #      DB_CONNECTION_URL: mongodb://admin:password@localhost:27018/?authMechanism=DEFAULT
-  #      SSO_SERVICE_LOGIN_ENDPOINT: http://localhost:3001/sso/login?redirectUrl=http://localhost:3002
-  #    ports:
-  #      - 3002:3002
-  #    networks:
-  #      - ates_network
+  task:
+    container_name: task
+    build:
+      context: .
+      dockerfile: ./apps/task-service/Dockerfile
+    restart: always
+    environment:
+      PORT: 3002
+      BROKER_PORT: 9092
+      DB_CONNECTION_URL: mongodb://admin:password@localhost:27018/?authMechanism=DEFAULT
+      SSO_SERVICE_LOGIN_ENDPOINT: http://localhost:3001/sso/login?redirectUrl=http://localhost:3002
+    ports:
+      - 3002:3002
+    networks:
+      - ates_network
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
@@ -92,26 +92,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-#  web:
-#    container_name: web
-#    build:
-#      context: .
-#      dockerfile: ./apps/web/Dockerfile
-#    restart: always
-#    ports:
-#      - 3000:3000
-#    networks:
-#      - ates_network
-#  api:
-#    container_name: api
-#    build:
-#      context: .
-#      dockerfile: ./apps/api/Dockerfile
-#    restart: always
-#    ports:
-#      - 3003:3003
-#    networks:
-#      - ates_network
 
 # Define a network, which allows containers to communicate
 # with each other, by using their container name as a hostname
