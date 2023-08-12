@@ -7,10 +7,23 @@ services:
       context: .
       dockerfile: ./apps/auth-service/Dockerfile
     restart: always
+    environment:
+      PORT: 3001
+      BROKER_PORT: 9092
+      DB_CONNECTION_URL: mongodb://admin:password@localhost:27017/?authMechanism=DEFAULT
     ports:
       - 3001:3001
     networks:
-      - app_network
+      - ates_network
+  auth-db:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - ates_network
   task:
     container_name: task
     build:
@@ -20,30 +33,54 @@ services:
     ports:
       - 3002:3002
     networks:
-      - app_network
-  web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-    restart: always
+      - ates_network
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka
     ports:
-      - 3000:3000
-    networks:
-      - app_network
-  api:
-    container_name: api
-    build:
-      context: .
-      dockerfile: ./apps/api/Dockerfile
-    restart: always
-    ports:
-      - 3003:3003
-    networks:
-      - app_network
+      # To learn about configuring Kafka for access across networks see
+      # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+#  web:
+#    container_name: web
+#    build:
+#      context: .
+#      dockerfile: ./apps/web/Dockerfile
+#    restart: always
+#    ports:
+#      - 3000:3000
+#    networks:
+#      - ates_network
+#  api:
+#    container_name: api
+#    build:
+#      context: .
+#      dockerfile: ./apps/api/Dockerfile
+#    restart: always
+#    ports:
+#      - 3003:3003
+#    networks:
+#      - ates_network
 
 # Define a network, which allows containers to communicate
 # with each other, by using their container name as a hostname
 networks:
-  app_network:
+  ates_network:
     external: true
