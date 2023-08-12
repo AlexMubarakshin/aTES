@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build-static-copy": "copyfiles -u 1 src/**/*.html dist/",
+    "build": "tsc && yarn build-static-copy",
     "clean": "rm -rf dist",
     "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\"",
@@ -28,6 +29,7 @@
     "@types/morgan": "^1.9.2",
     "@types/node": "^15.12.2",
     "@types/supertest": "^2.0.11",
+    "copyfiles": "2.4.1",
     "esbuild": "^0.14.38",
     "esbuild-register": "^3.3.2",
     "eslint": "^7.32.0",

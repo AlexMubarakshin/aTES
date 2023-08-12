@@ -2,8 +2,8 @@
 
 ### Apps and Packages
 
-- `web`: a Next.JS app
-- `api`: an simple express server
+- `auth-service`: SSO service
+- `task-service`: Task (tickets) service
 - `eslint-config-custom`: `eslint` configurations for client side applications (includes `eslint-config-next` and `eslint-config-prettier`)
 - `eslint-config-custom-server`: `eslint` configurations for server side applications (includes `eslint-config-next` and `eslint-config-prettier`)
 - `scripts`: Jest configurations
