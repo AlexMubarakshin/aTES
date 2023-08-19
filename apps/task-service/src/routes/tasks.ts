@@ -163,7 +163,7 @@ export const tasksRouter = express.Router()
         version: 1
       })
       // Produce a message to Kafka after updating the task status
-      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, []);
+      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [event]);
 
       res.status(200).send(task);
     } catch (error) {
