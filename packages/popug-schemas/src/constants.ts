@@ -26,6 +26,13 @@ export type ICudEventsValues = typeof CUD_EVENT[keyof typeof CUD_EVENT]
 export type IBusinessEventsValues = typeof BUSINESS_EVENT[keyof typeof BUSINESS_EVENT]
 
 export type IBrokerEvent = {
-  type: ICudEventsValues | IBusinessEventsValues,
-  data: Record<string, any>
+  type: ICudEventsValues | IBusinessEventsValues;
+  version: number;
+  data: Record<string, any>;
 } & Record<string, any>
+
+export type IBrokerTransportEvent = IBrokerEvent & {
+  producer: string
+  time: Date,
+  id: string
+}

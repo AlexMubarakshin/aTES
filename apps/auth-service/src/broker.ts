@@ -1,6 +1,6 @@
 import {Kafka, logLevel} from "kafkajs";
 import {CONFIG} from "./config";
-import {IBrokerEvent, IBrokerTopic} from 'popug-schemas'
+import {IBrokerEvent, IBrokerTopic, IBrokerTransportEvent} from 'popug-schemas'
 import {uuid} from 'popug-shared'
 
 const KAFKA_CLIENT_ID = 'auth-application';
@@ -24,7 +24,7 @@ export async function sendMessages(topic: IBrokerTopic, events: IBrokerEvent[]) 
       producer: KAFKA_CLIENT_ID,
       time: new Date(),
       id: uuid()
-    })
+    } as IBrokerTransportEvent)
   }));
 
   return producer.send({topic, messages});

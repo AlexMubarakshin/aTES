@@ -40,7 +40,9 @@ export const ssoRoutes = express.Router()
       }
 
       await sendMessages(TOPICS_NAMES.USERS_STREAM, [{
-        type: CUD_EVENT.USER_CREATED, data: popug
+        type: CUD_EVENT.USER_CREATED,
+        data: popug,
+        version: 1
       }])
 
       res.redirect(`/sso/login?redirectUrl=${redirectUrl}`);

@@ -158,7 +158,11 @@ export const tasksRouter = express.Router()
       await task.save();
 
       // Produce a message to Kafka after updating the task status
-      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [{type: BUSINESS_EVENT.TASK_COMPLETED, data: task}]);
+      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [{
+        type: BUSINESS_EVENT.TASK_COMPLETED,
+        data: task,
+        version: 1
+      }]);
 
       res.status(200).send(task);
     } catch (error) {
@@ -169,7 +173,8 @@ export const tasksRouter = express.Router()
     const emitter = (req.session as any).user as IPopug;
     const event = {
       type: BUSINESS_EVENT.TASKS_SHUFFLE_STARTED,
-      data: {emitter: emitter.publicId}
+      data: {emitter: emitter.publicId},
+      version: 1
     };
 
     await sendMessages(TOPICS_NAMES.TASKS_SHUFFLE_STARTED, [event]);

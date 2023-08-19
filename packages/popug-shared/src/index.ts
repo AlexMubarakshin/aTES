@@ -1,6 +1,7 @@
 export {uuid} from './uuid'
 
 export const POPUG_ROLES = {
+  'accounting': 'accounting',
   'admin': 'admin',
   'regular': 'regular'
 } as const

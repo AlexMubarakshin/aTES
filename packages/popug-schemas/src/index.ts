@@ -1,2 +1,2 @@
 export * from './constants';
-export const schemas = {} as const
+export {validateEvent} from './validate'
