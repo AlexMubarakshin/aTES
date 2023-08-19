@@ -3,7 +3,7 @@ import {BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
 import {IPopug, POPUG_ROLES, TasksStatuses,} from "popug-shared";
 import {Kafka} from 'kafkajs';
 import {CONFIG} from "../config";
-import {sendMessages} from "../broker";
+import {sendMessages, createEvent} from "../broker";
 import {User} from "../schemas/user";
 import {Task} from "../schemas/task";
 
@@ -157,12 +157,13 @@ export const tasksRouter = express.Router()
 
       await task.save();
 
-      // Produce a message to Kafka after updating the task status
-      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [{
+      const event = createEvent({
         type: BUSINESS_EVENT.TASK_COMPLETED,
         data: task,
         version: 1
-      }]);
+      })
+      // Produce a message to Kafka after updating the task status
+      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, []);
 
       res.status(200).send(task);
     } catch (error) {
@@ -171,11 +172,13 @@ export const tasksRouter = express.Router()
   })
   .post('/shuffle', async (req, res) => {
     const emitter = (req.session as any).user as IPopug;
-    const event = {
+    const partialEvent = {
       type: BUSINESS_EVENT.TASKS_SHUFFLE_STARTED,
       data: {emitter: emitter.publicId},
       version: 1
     };
+
+    const event = createEvent(partialEvent)
 
     await sendMessages(TOPICS_NAMES.TASKS_SHUFFLE_STARTED, [event]);
   });

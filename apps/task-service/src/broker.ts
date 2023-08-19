@@ -43,3 +43,15 @@ export async function sendMessages(topic: IBrokerTopic, events: IBrokerEvent[]) 
 
   return producer.send({topic, messages});
 }
+
+export function createEvent(partialEvent: Omit<IBrokerEvent, 'producer' | 'time' | 'id'>): IBrokerEvent {
+  const event: IBrokerEvent = {
+    producer: KAFKA_CLIENT_ID,
+    time: new Date(),
+    id: uuid(),
+    ...partialEvent
+  } as any
+
+  return event
+}
+

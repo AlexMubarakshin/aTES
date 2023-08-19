@@ -5,7 +5,7 @@ import path from "path";
 import {IPopug, uuid} from "popug-shared";
 import {CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
 import {User} from "../schemas/user";
-import {sendMessages} from "../broker";
+import {sendMessages, createEvent} from "../broker";
 
 export const ssoRoutes = express.Router()
   .get('/register', (req, res) => {
@@ -35,15 +35,17 @@ export const ssoRoutes = express.Router()
 
       const popug: IPopug = {
         publicId,
-        email: user.email,
-        role: user.role
+        email: req.body.email,
+        role: 'accounting'
       }
 
-      await sendMessages(TOPICS_NAMES.USERS_STREAM, [{
+      const event = createEvent({
         type: CUD_EVENT.USER_CREATED,
         data: popug,
         version: 1
-      }])
+      })
+
+      await sendMessages(TOPICS_NAMES.USERS_STREAM, [event])
 
       res.redirect(`/sso/login?redirectUrl=${redirectUrl}`);
     } catch (error) {
@@ -74,8 +76,6 @@ export const ssoRoutes = express.Router()
         role: user.role,
       }
       const token = jwt.sign(popug, 'SUPER_SECRET_KEY');
-
-      console.log({popug, token})
 
       user.tokens = user.tokens.concat({token});
       await user.save();
