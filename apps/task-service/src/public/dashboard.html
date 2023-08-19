@@ -20,6 +20,10 @@
 <h2>Create Task</h2>
 <form id="createTaskForm">
     <div>
+        <label for="title">JiraId:</label>
+        <input type="text" id="jiraId" name="title" required>
+    </div>
+    <div>
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" required>
     </div>
@@ -36,6 +40,7 @@
 <table>
     <thead>
     <tr>
+        <th>JiraId</th>
         <th>Title</th>
         <th>Assignee ID</th>
         <th>Creator ID</th>
@@ -66,11 +71,12 @@
                 tableBody.innerHTML = '';
                 tasks.forEach(task => {
                     const row = tableBody.insertRow();
-                    row.insertCell(0).textContent = task.title;
-                    row.insertCell(1).textContent = task.assigneeId;
-                    row.insertCell(2).textContent = task.creatorId;
-                    row.insertCell(3).textContent = task.description;
-                    row.insertCell(4).textContent = task.status;
+                    row.insertCell(0).textContent = task.jiraId;
+                    row.insertCell(1).textContent = task.title;
+                    row.insertCell(2).textContent = task.assigneeId;
+                    row.insertCell(3).textContent = task.creatorId;
+                    row.insertCell(4).textContent = task.description;
+                    row.insertCell(5).textContent = task.status;
                 });
             }
         };
