@@ -26,7 +26,6 @@
     "logger": "*",
     "mongoose": "^7.4.3",
     "morgan": "^1.10.0",
-    "popug-schemas": "*",
     "popug-shared": "*"
   },
   "devDependencies": {
