@@ -10,7 +10,6 @@ const schema = schemaBase.keys({
     publicId: Joi.string().guid({version: ['uuidv4']}).required(),
     role: Joi.string().valid(...Object.values(POPUG_ROLES)).required(),
     email: Joi.string().email().required(),
-    username: Joi.string().required()
   })
 });
 
