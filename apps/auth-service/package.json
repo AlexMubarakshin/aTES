@@ -23,6 +23,7 @@
     "kafkajs": "^2.2.4",
     "logger": "*",
     "morgan": "^1.10.0",
+    "popug-schemas": "*",
     "popug-shared": "*"
   },
   "devDependencies": {

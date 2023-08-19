@@ -1,5 +1,6 @@
 import express from 'express';
-import {BUSINESS_EVENT, CUD_EVENT, IPopug, POPUG_ROLES, TasksStatuses, TOPICS_NAMES} from "popug-shared";
+import {BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
+import {IPopug, POPUG_ROLES, TasksStatuses,} from "popug-shared";
 import {Kafka} from 'kafkajs';
 import {CONFIG} from "../config";
 import {sendMessages} from "../broker";

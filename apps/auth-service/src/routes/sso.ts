@@ -2,7 +2,8 @@ import bcrypt from "bcryptjs";
 import express from "express";
 import jwt from "jsonwebtoken";
 import path from "path";
-import {CUD_EVENT, IPopug, TOPICS_NAMES, uuid} from "popug-shared";
+import {IPopug, uuid} from "popug-shared";
+import {CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
 import {User} from "../schemas/user";
 import {sendMessages} from "../broker";
 

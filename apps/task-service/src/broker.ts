@@ -1,6 +1,7 @@
-import {Kafka, logLevel} from "kafkajs";
+import {Kafka} from "kafkajs";
 import {CONFIG} from "./config";
-import {IBrokerEvent, IBrokerTopic, TOPICS_NAMES, uuid} from 'popug-shared'
+import {IBrokerEvent, IBrokerTopic, TOPICS_NAMES} from 'popug-schemas'
+import {uuid} from 'popug-shared'
 
 import {processMessage as processUserMessage} from './operations/user'
 

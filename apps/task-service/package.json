@@ -22,6 +22,7 @@
     "express-session": "^1.17.3",
     "logger": "*",
     "morgan": "^1.10.0",
+    "popug-schemas": "*",
     "popug-shared": "*"
   },
   "devDependencies": {

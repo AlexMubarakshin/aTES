@@ -1,4 +1,4 @@
-import {CUD_EVENT, IBrokerEvent} from "popug-shared";
+import {CUD_EVENT, IBrokerEvent} from "popug-schemas";
 import {User} from "../schemas/user";
 import {IProcessMessage} from "./types";
 
