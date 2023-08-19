@@ -1,20 +1,9 @@
 import express from 'express';
 import {BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
 import {IPopug, POPUG_ROLES, TasksStatuses,} from "popug-shared";
-import {Kafka} from 'kafkajs';
-import {CONFIG} from "../config";
 import {sendMessages, createEvent} from "../broker";
 import {User} from "../schemas/user";
 import {Task} from "../schemas/task";
-
-const KAFKA_CLIENT_ID = 'task-service'
-
-const kafka = new Kafka({
-  clientId: KAFKA_CLIENT_ID,
-  brokers: [`localhost:${CONFIG['broker_port']}`]
-});
-
-const producer = kafka.producer();
 
 export const tasksRouter = express.Router()
   .get('/', async (req, res) => {
@@ -30,7 +19,7 @@ export const tasksRouter = express.Router()
       const {title, description} = req.body;
 
       const {user} = (req.session as any);
-      // console.log({creatorId})
+
       const userCount = await User.countDocuments({role: POPUG_ROLES.regular});
       const randomUser = await User.findOne().skip(Math.floor(Math.random() * userCount));
 
@@ -43,15 +32,13 @@ export const tasksRouter = express.Router()
       const task = new Task({title, assigneeId, creatorId: (user as IPopug).publicId, description});
       await task.save();
 
-      await producer.send({
-        topic: TOPICS_NAMES.TASKS_ADDED,
-        messages: [
-          {
-            key: BUSINESS_EVENT.TASK_ADDED,
-            value: JSON.stringify({taskId: task._id, title: task.title, description: task.description, assigneeId})
-          }
-        ]
+      const event = createEvent({
+        type: BUSINESS_EVENT.TASK_ADDED,
+        version: 1,
+        data: {taskId: task._id, title: task.title, description: task.description, assigneeId}
       });
+
+      await sendMessages(TOPICS_NAMES.TASKS_ADDED, [event]);
 
       res.status(201).send(task);
     } catch (error) {
@@ -78,21 +65,18 @@ export const tasksRouter = express.Router()
         return res.status(404).send({error: 'Task not found'});
       }
 
-      // Produce a message to Kafka after updating the task
-      await producer.send({
-        topic: TOPICS_NAMES.TASKS_STREAM,
-        messages: [
-          {
-            key: CUD_EVENT.TASK_UPDATED,
-            value: JSON.stringify({
-              taskId: task._id,
-              title: task.title,
-              description: task.description,
-              status: task.status
-            })
-          }
-        ]
+      const event = createEvent({
+        type: CUD_EVENT.TASK_UPDATED,
+        version: 1,
+        data: {
+          taskId: task._id,
+          title: task.title,
+          description: task.description,
+          status: task.status
+        }
       });
+
+      await sendMessages(TOPICS_NAMES.TASKS_STREAM, [event]);
 
       res.send(task);
     } catch (error) {
@@ -106,16 +90,15 @@ export const tasksRouter = express.Router()
         return res.status(404).send({error: 'Task not found'});
       }
 
-      // Produce a message to Kafka after completing the task
-      await producer.send({
-        topic: TOPICS_NAMES.TASKS_COMPLETED,
-        messages: [
-          {
-            key: BUSINESS_EVENT.TASK_COMPLETED,
-            value: JSON.stringify({taskId: task._id})
-          }
-        ]
+      const event = createEvent({
+        type: BUSINESS_EVENT.TASK_COMPLETED,
+        version: 1,
+        data: {
+          taskId: task._id
+        }
       });
+
+      await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [event]);
 
       res.send(task);
     } catch (error) {
