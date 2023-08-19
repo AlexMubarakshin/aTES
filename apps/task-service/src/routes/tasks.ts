@@ -1,5 +1,5 @@
 import express from 'express';
-import {BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
+import {BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES, validateEvent} from "popug-schemas";
 import {IPopug, POPUG_ROLES, TasksStatuses,} from "popug-shared";
 import {Kafka} from 'kafkajs';
 import {CONFIG} from "../config";
@@ -162,7 +162,13 @@ export const tasksRouter = express.Router()
         data: task,
         version: 1
       })
-      // Produce a message to Kafka after updating the task status
+
+      const eventValidationResult = validateEvent(event);
+      if (!eventValidationResult.isValid) {
+        console.error(eventValidationResult.error);
+        throw new Error('Event schema validation error')
+      }
+
       await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [event]);
 
       res.status(200).send(task);
@@ -179,6 +185,12 @@ export const tasksRouter = express.Router()
     };
 
     const event = createEvent(partialEvent)
+
+    const eventValidationResult = validateEvent(event);
+    if (!eventValidationResult.isValid) {
+      console.error(eventValidationResult.error);
+      throw new Error('Event schema validation error')
+    }
 
     await sendMessages(TOPICS_NAMES.TASKS_SHUFFLE_STARTED, [event]);
   });

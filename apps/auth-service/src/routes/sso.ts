@@ -3,7 +3,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import path from "path";
 import {IPopug, uuid} from "popug-shared";
-import {CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
+import {CUD_EVENT, TOPICS_NAMES, validateEvent} from "popug-schemas";
 import {User} from "../schemas/user";
 import {sendMessages, createEvent} from "../broker";
 
@@ -44,6 +44,12 @@ export const ssoRoutes = express.Router()
         data: popug,
         version: 1
       })
+
+      const eventValidationResult = validateEvent(event);
+      if (!eventValidationResult.isValid) {
+        console.error(eventValidationResult.error);
+        throw new Error('Event schema validation error')
+      }
 
       await sendMessages(TOPICS_NAMES.USERS_STREAM, [event])
 
