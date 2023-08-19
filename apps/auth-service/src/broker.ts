@@ -1,8 +1,6 @@
 import {Kafka, logLevel} from "kafkajs";
-import * as timers from "timers";
 import {CONFIG} from "./config";
-import {CUD_EVENT, IBrokerEvent, IBrokerTopic, IBrokerTransportEvent, validateEvent} from 'popug-schemas'
-import {uuid} from 'popug-shared'
+import {uuid, IBrokerEvent, IBrokerTopic} from 'popug-shared'
 
 const KAFKA_CLIENT_ID = 'auth-application';
 

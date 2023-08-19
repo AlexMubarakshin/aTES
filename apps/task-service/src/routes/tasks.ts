@@ -1,6 +1,5 @@
 import express from 'express';
-import {BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-schemas";
-import {IPopug, POPUG_ROLES, TasksStatuses,} from "popug-shared";
+import {IPopug, POPUG_ROLES, TasksStatuses, BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-shared";
 import {sendMessages, createEvent} from "../broker";
 import {User} from "../schemas/user";
 import {Task} from "../schemas/task";

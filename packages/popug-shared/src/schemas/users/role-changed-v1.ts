@@ -1,7 +1,10 @@
 import Joi from "joi";
-import {POPUG_ROLES} from "popug-shared";
 import {BUSINESS_EVENT} from "../constants";
 import schemaBase from "../schema-base";
+
+import {POPUG_ROLES} from "../../roles";
+
+console.log({POPUG_ROLES})
 
 const schema = schemaBase.keys({
   version: Joi.number().valid(1).required(),
