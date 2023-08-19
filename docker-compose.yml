@@ -48,6 +48,21 @@ services:
       - 3002:3002
     networks:
       - ates_network
+  accounting:
+    container_name: accounting
+    build:
+      context: .
+      dockerfile: ./apps/accounting-service/Dockerfile
+    restart: always
+    environment:
+      PORT: 3003
+      BROKER_PORT: 9092
+      DB_CONNECTION_URL: mongodb://admin:password@localhost:27018/?authMechanism=DEFAULT
+      SSO_SERVICE_LOGIN_ENDPOINT: http://localhost:3001/sso/login?redirectUrl=http://localhost:3003
+    ports:
+      - 3003:3003
+    networks:
+      - ates_network
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
