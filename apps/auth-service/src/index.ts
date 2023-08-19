@@ -1,9 +1,14 @@
-import { createServer } from "./server";
-import { log } from "logger";
+import {initBrokerConnection} from "./broker";
+import {initDatabaseConnection} from "./database";
+import {CONFIG} from "./config";
+import {createServer} from "./server";
+import {log} from "logger";
 
-const port = process.env.PORT || 3001;
+initDatabaseConnection();
+initBrokerConnection().catch(log)
+
 const server = createServer();
 
-server.listen(port, () => {
-  log(`auth service running on ${port}`);
+server.listen(CONFIG.port, () => {
+  log(`auth service running on ${CONFIG.port}`);
 });
