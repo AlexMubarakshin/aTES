@@ -33,6 +33,15 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     networks:
       - ates_network
+  accounting-db:
+    image: mongo:latest
+    ports:
+      - '27019:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - ates_network
   task:
     container_name: task
     build:
