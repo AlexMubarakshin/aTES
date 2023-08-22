@@ -1,5 +1,5 @@
 import express from 'express';
-import {IPopug, POPUG_ROLES, TasksStatuses, BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES} from "popug-shared";
+import {IPopug, POPUG_ROLES, TasksStatuses, BUSINESS_EVENT, CUD_EVENT, TOPICS_NAMES, validateEvent} from "popug-shared";
 import {sendMessages, createEvent} from "../broker";
 import {User} from "../schemas/user";
 import {Task} from "../schemas/task";
@@ -15,7 +15,7 @@ export const tasksRouter = express.Router()
   })
   .post('/create', async (req, res) => {
     try {
-      const {title, description} = req.body;
+      const {title, description, jiraId} = req.body;
 
       const {user} = (req.session as any);
 
@@ -28,13 +28,13 @@ export const tasksRouter = express.Router()
       }
 
       const assigneeId = randomUser.publicId
-      const task = new Task({title, assigneeId, creatorId: (user as IPopug).publicId, description});
+      const task = new Task({title, assigneeId, creatorId: (user as IPopug).publicId, description, jiraId});
       await task.save();
 
       const event = createEvent({
         type: BUSINESS_EVENT.TASK_ADDED,
         version: 1,
-        data: {taskId: task._id, title: task.title, description: task.description, assigneeId}
+        data: {taskId: task._id, title: task.title, description: task.description, assigneeId, jiraId: task.jiraId}
       });
 
       await sendMessages(TOPICS_NAMES.TASKS_ADDED, [event]);
@@ -144,7 +144,13 @@ export const tasksRouter = express.Router()
         data: task,
         version: 1
       })
-      // Produce a message to Kafka after updating the task status
+
+      const eventValidationResult = validateEvent(event);
+      if (!eventValidationResult.isValid) {
+        console.error(eventValidationResult.error);
+        throw new Error('Event schema validation error')
+      }
+
       await sendMessages(TOPICS_NAMES.TASKS_COMPLETED, [event]);
 
       res.status(200).send(task);
@@ -161,6 +167,12 @@ export const tasksRouter = express.Router()
     };
 
     const event = createEvent(partialEvent)
+
+    const eventValidationResult = validateEvent(event);
+    if (!eventValidationResult.isValid) {
+      console.error(eventValidationResult.error);
+      throw new Error('Event schema validation error')
+    }
 
     await sendMessages(TOPICS_NAMES.TASKS_SHUFFLE_STARTED, [event]);
   });

@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import express from "express";
 import jwt from "jsonwebtoken";
 import path from "path";
-import {CUD_EVENT, TOPICS_NAMES, IPopug, uuid, validateEvent} from "popug-shared";
+import {CUD_EVENT, TOPICS_NAMES, IPopug, uuid, validateEvent, POPUG_ROLES} from "popug-shared";
 import {User} from "../schemas/user";
 import {sendMessages, createEvent} from "../broker";
 
@@ -35,7 +35,7 @@ export const ssoRoutes = express.Router()
       const popug: IPopug = {
         publicId,
         email: req.body.email,
-        role: 'accounting'
+        role: POPUG_ROLES.regular
       }
 
       const event = createEvent({
@@ -43,6 +43,12 @@ export const ssoRoutes = express.Router()
         data: popug,
         version: 1
       })
+
+      const eventValidationResult = validateEvent(event);
+      if (!eventValidationResult.isValid) {
+        console.error(eventValidationResult.error);
+        throw new Error('Event schema validation error')
+      }
 
       await sendMessages(TOPICS_NAMES.USERS_STREAM, [event])
 
