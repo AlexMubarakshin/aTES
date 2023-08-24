@@ -1,12 +1,27 @@
-# Awesome Task Exchange System
+# Awesome Task Exchange System [Homework on the course "[Distributed Systems]((https://education.borshev.com/architecture))"]
+
+Welcome to the Awesome Task Exchange System, a project showcasing completed homework assignments for the course on
+Distributed Systems. You can find more about the course [here (RUS)](https://education.borshev.com/architecture).
+
+## ⚠️ Caution 💩 Code Ahead
+
+Please note that the code in this repository is intended for educational purposes and may not adhere to production-level
+standards. There might be instances of suboptimal or incomplete code that should be used with caution.
+
+### Requirements
+
+Read requirements [here](./docs/Requirements.md)
 
 ### Apps and Packages
 
+- `accounting-service`: Accounting service
 - `auth-service`: SSO service
 - `task-service`: Task (tickets) service
-- `eslint-config-custom`: `eslint` configurations for client side applications (includes `eslint-config-next` and `eslint-config-prettier`)
-- `eslint-config-custom-server`: `eslint` configurations for server side applications (includes `eslint-config-next` and `eslint-config-prettier`)
-- `scripts`: Jest configurations
+- `eslint-config-custom`: `eslint` configurations for client side applications (includes `eslint-config-next`
+  and `eslint-config-prettier`)
+- `eslint-config-custom-server`: `eslint` configurations for server side applications (includes `eslint-config-next`
+  and `eslint-config-prettier`)
+- `popug-shared`: Shared code (types, events schemas)
 - `logger`: Isomorphic logger (a small wrapper around console.log)
 - `tsconfig`: tsconfig.json;s used throughout the monorepo
 
@@ -34,22 +49,3 @@ To shutdown all running containers:
 # Stop all running containers
 docker kill $(docker ps -q) && docker rm $(docker ps -a -q)
 ```
-
-### Remote Caching
-
-This example includes optional remote caching. In the Dockerfiles of the apps, uncomment the build arguments for `TURBO_TEAM` and `TURBO_TOKEN`. Then, pass these build arguments to your Docker build.
-
-You can test this behavior using a command like:
-
-`docker build -f apps/web/Dockerfile . --build-arg TURBO_TEAM=“your-team-name” --build-arg TURBO_TOKEN=“your-token“ --no-cache`
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
